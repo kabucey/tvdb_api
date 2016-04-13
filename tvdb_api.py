@@ -538,6 +538,8 @@ class Tvdb:
         self.config['url_seriesBanner'] = u"%(base_url)s/api/%(apikey)s/series/%%s/banners.xml" % self.config
         self.config['url_artworkPrefix'] = u"%(base_url)s/banners/%%s" % self.config
 
+        self.config['url_updates'] = u"%(base_url)s/api/Updates.php?type=all&time=%%d" % self.config
+
     def _getTempDir(self):
         """Returns the [system temp dir]/tvdb_api-u501 (or
         tvdb_api-myuser)
@@ -708,6 +710,13 @@ class Tvdb:
             allSeries.append(result)
         
         return allSeries
+
+    def update(self, last_update_time):
+        """Returns a list of series ids that have been updated since last_update_time."""
+        updates = self._getetsrc(
+            self.config['url_updates'] % last_update_time
+        )
+        return [int(series.text) for series in updates.findall("Series")]
 
     def _getSeries(self, series):
         """This searches TheTVDB.com for the series name,
